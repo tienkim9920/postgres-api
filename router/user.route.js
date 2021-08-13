@@ -5,23 +5,41 @@ const User = require('../schema/User.js')
 
 const router = express.Router()
 
-// Lấy tất cả
+// Lấy tất cả có quan hệ một nhiều
 router.get('/', async (req, res) => {
 
     const users = await User.findAll({
-        include: [
-            {
-                model: Task,
-                include: Task
-            }
-        ]
+        include: [{
+            model: Task
+        }]
     })
 
     res.json(users)
 
 })
 
-// Lấy phụ thuộc vào điều điện
+// Lấy tất cả có quan hệ một nhiều kèm thêm điều kiện cho table child là task
+router.get('/task', async (req, res) => {
+
+    const taskId = req.query.id
+
+    const users = await User.findAll({
+        include: [{
+            model: Task,
+            where: {
+                // id: taskId       -- đây là bằng
+                id: {
+                    [Op.gt]: taskId
+                }
+            }
+        }]
+    })
+
+    res.json(users)
+
+})
+
+// Lấy tất cả có quan hệ một nhiều kèm điều kiện cho table parent là user
 router.get('/condition', async (req, res) => {
     
     // Note: gt: >, lt: < 
@@ -31,7 +49,10 @@ router.get('/condition', async (req, res) => {
             id: {
                 [Op.gt]: 1
             }
-        }
+        },
+        include: [{
+            model: Task
+        }],
     })
 
     res.json(users)

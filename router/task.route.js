@@ -7,7 +7,11 @@ const router = express.Router()
 router.get('/', async (req, res) => {
 
     const tasks = await Task.findAll({
-        include: User
+        include: [
+            {
+                model: User
+            }
+        ]
     })
 
     res.json(tasks)
